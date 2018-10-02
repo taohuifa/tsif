@@ -102,6 +102,10 @@ func Error(msg string, showstack bool) {
 	Log.Error(msg, showstack)
 }
 
+func Write(level int, msg string, showstack bool) {
+	Log.Write(level, msg, showstack)
+}
+
 // func Debug(msg string) {
 // 	Instance.Debug(msg, false)
 // }

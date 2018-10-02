@@ -7,11 +7,15 @@ import (
 	"sync"
 	"sync/atomic"
 	"time"
+
+	"net/http"
 )
 
 const (
-	SESSION_MAX_TIME     = int64(1 * time.Second) // session超时时间
-	SESSION_UPDATE_COUNT = 10                     // session更新次数
+	SESSION_MAX_TIME     = int64(10 * time.Second) // session超时时间
+	SESSION_UPDATE_COUNT = 10                      // session更新次数
+	COOKIE_SESSION_NAME  = "SESSION"               // cookie Session储存名字
+	COOKIE_MAX_TIME      = int(10 * time.Second)   // cookie超时时间
 )
 
 //----------------------session----------------------------
@@ -147,6 +151,30 @@ func (this *SessionManager) update() error {
 	}
 
 	return nil
+}
+
+// 使用cookie处理session
+func (this *SessionManager) Start(w http.ResponseWriter, r *http.Request) (*Session, error) {
+	var session *Session
+	// 获取储存的session
+	cookie, err := r.Cookie(COOKIE_SESSION_NAME)
+	if err == nil {
+		sessionId := cookie.Value
+		session, err = this.Get(sessionId)
+		if err == nil {
+			return session, nil
+		}
+	}
+	// 新建session
+	session, err = this.New()
+	if err != nil {
+		return nil, err // 错误
+	}
+
+	//让浏览器cookie设置过期时间
+	cookie = &http.Cookie{Name: COOKIE_SESSION_NAME, Value: session.ID, Path: "/", HttpOnly: true, MaxAge: COOKIE_MAX_TIME}
+	http.SetCookie(w, cookie)
+	return session, nil
 }
 
 //--------------------instance-------------------------

@@ -3,6 +3,7 @@ package http
 import (
 	"bytes"
 	"fmt"
+	_ "net/url"
 	// "log"      //日志库
 
 	"encoding/json"
@@ -80,7 +81,9 @@ func ResponseJson(obj interface{}, w http.ResponseWriter) {
 		ResponseStr("json error: "+err.Error(), w)
 		return
 	}
-	Response(jdata, w)
+	//vstr := url.QueryEscape(string(jdata))
+	vstr := jdata
+	Response([]byte(vstr), w)
 }
 
 func ResponseResult(code int, msg string, w http.ResponseWriter) {
