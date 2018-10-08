@@ -214,6 +214,6 @@ func RemoveValue(sessionId string, key interface{}, value interface{}) error {
 }
 
 func init() {
-	fmt.Printf("session init")
+	fmt.Println("session init")
 	// Log.Debug("session init", false)
 }

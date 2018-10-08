@@ -14,19 +14,19 @@ type ObjTable struct {
 
 //对象转成表
 func Obj2Table(obj interface{}) *ObjTable {
-	typeObj := reflect.TypeOf(obj)
-	// typeElem := typeObj.Elem() 如果typeObj是指针, 用这个获取类
-	// fmt.Println("typeObj", typeObj, typeElem)
+	objType := reflect.TypeOf(obj)
+	// typeElem := objType.Elem() 如果objType是指针, 用这个获取类
+	// fmt.Println("objType", objType, typeElem)
 	//表名
 	tb := new(ObjTable)
-	tb.Name = typeObj.Name()
+	tb.Name = objType.Name()
 	//列
-	fildNum := typeObj.NumField()
+	fildNum := objType.NumField()
 	tb.Cloum = make([]string, fildNum)
 	tb.Values = make([]interface{}, fildNum)
 	for i := 0; i < fildNum; i++ {
 		//列名
-		cloumName := typeObj.Field(i).Name
+		cloumName := objType.Field(i).Name
 		tb.Cloum[i] = cloumName
 		//列值
 		val := reflect.ValueOf(obj).FieldByName(cloumName)
@@ -38,7 +38,7 @@ func Obj2Table(obj interface{}) *ObjTable {
 //对象转成表
 func Obj2Map(obj interface{}) *map[string]interface{} {
 	objType := reflect.TypeOf(obj)
-	// fmt.Println("typeObj", objType)
+	// fmt.Println("objType", objType)
 
 	// 遍历解析
 	out_map := make(map[string]interface{})
