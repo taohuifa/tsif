@@ -4,10 +4,13 @@ import (
 	"fmt"
 	"reflect"
 
+	"github.com/tsif/app"
 	"github.com/tsif/utils"
+
+	Log "github.com/tsif/component/log"
 )
 
-func main() {
+func test01() {
 	fmt.Println("hello world")
 
 	kinds := []reflect.Kind{
@@ -27,11 +30,33 @@ func main() {
 		reflect.String,
 	}
 
+	str := "01234567"
 	for i := 0; i < len(kinds); i++ {
-		str := "1234567"
 		kind := kinds[i]
 		v := utils.ChangeType(str, kind)
 		fmt.Println(str, kind, v, reflect.TypeOf(v))
 	}
 
+}
+
+func test02() {
+	// init app
+	initFunc := func(context *app.AppContext, params ...interface{}) bool {
+		context.Stop(5 * 1000)
+		return true
+	}
+	destroyFunc := func(context *app.AppContext) {
+
+	}
+	appCtx := app.AppContext{Name: "app", InitFunc: initFunc, DestroyFunc: destroyFunc}
+	// start
+	err := appCtx.Start(1, 2, "3")
+	if err != nil {
+		Log.Info("app start fail! " + err.Error())
+	}
+}
+
+func main() {
+	// test01()
+	test02()
 }

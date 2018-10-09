@@ -18,7 +18,24 @@ func Error(msg string) {
 }
 
 func Write(loglv int, frame int, msg string) {
-	Log.Write(loglv, frame, msg, "")
+	Log.Write(loglv, frame, "", msg)
+}
+
+func Debugf(params ...interface{}) {
+	Log.Debugf(params...)
+}
+func Infof(params ...interface{}) {
+	Log.Infof(params...)
+}
+func Warnf(params ...interface{}) {
+	Log.Warnf(params...)
+}
+func Errorf(params ...interface{}) {
+	Log.Errorf(params...)
+}
+
+func Writef(loglv int, frame int, params ...interface{}) {
+	Log.Write(loglv, frame+1, "", ToString(params...))
 }
 
 func DebugStack(msg string) {

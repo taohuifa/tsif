@@ -111,6 +111,21 @@ func createLogger(loglv int, logPath string, logName string) *log.Logger {
 	return l
 }
 
+// to string
+func ToString(params ...interface{}) string {
+	pnum := len(params)
+	var buffer bytes.Buffer
+	// write string
+	for i := 0; i < pnum; i++ {
+		if i > 0 {
+			buffer.WriteString("\t")
+		}
+		str := fmt.Sprint(params[i])
+		buffer.WriteString(str)
+	}
+	return buffer.String()
+}
+
 func From(loglv int, logPath string, logName string) *LogContext {
 	if !checkLogLv(loglv) {
 		panic(errors.New("error log level " + fmt.Sprint(loglv)))
@@ -145,7 +160,7 @@ func (this *LogContext) GetLogger(loglv int) *log.Logger {
 }
 
 // 输出函数
-func (this *LogContext) Write(loglv int, frame int, msg string, ext string) {
+func (this *LogContext) Write(loglv int, frame int, ext string, msg string) {
 	//check log level
 	if loglv < this.logLevel {
 		return
@@ -179,20 +194,43 @@ func (this *LogContext) Write(loglv int, frame int, msg string, ext string) {
 
 // 输出函数和堆栈
 func (this *LogContext) WriteStack(loglv int, frame int, msg string) {
-	this.Write(loglv, frame, msg, getStack(frame+1, 99))
+	this.Write(loglv, frame, getStack(frame+1, 99), msg)
+}
+
+// 输出函数
+func (this *LogContext) Writef(loglv int, frame int, ext string, params ...interface{}) {
+	this.Write(loglv, frame, ext, ToString(params...))
+}
+
+// 输出函数和堆栈
+func (this *LogContext) WriteStackf(loglv int, frame int, params ...interface{}) {
+	this.WriteStack(loglv, frame, ToString(params...))
 }
 
 func (this *LogContext) Debug(msg string) {
-	this.Write(LOG_DEBUG, 4, msg, "")
+	this.Write(LOG_DEBUG, 4, "", msg)
 }
 func (this *LogContext) Info(msg string) {
-	this.Write(LOG_INFO, 4, msg, "")
+	this.Write(LOG_INFO, 4, "", msg)
 }
 func (this *LogContext) Warn(msg string) {
-	this.Write(LOG_WARN, 4, msg, "")
+	this.Write(LOG_WARN, 4, "", msg)
 }
 func (this *LogContext) Error(msg string) {
-	this.Write(LOG_ERROR, 4, msg, "")
+	this.Write(LOG_ERROR, 4, "", msg)
+}
+
+func (this *LogContext) Debugf(params ...interface{}) {
+	this.Writef(LOG_DEBUG, 5, "", params...)
+}
+func (this *LogContext) Infof(params ...interface{}) {
+	this.Writef(LOG_INFO, 5, "", params...)
+}
+func (this *LogContext) Warnf(params ...interface{}) {
+	this.Writef(LOG_WARN, 5, "", params...)
+}
+func (this *LogContext) Errorf(params ...interface{}) {
+	this.Writef(LOG_ERROR, 5, "", params...)
 }
 
 func (this *LogContext) DebugStack(msg string) {
