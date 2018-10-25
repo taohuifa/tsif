@@ -1,9 +1,9 @@
 package http
 
 import (
-	"bytes"
+	// "bytes"
 	"fmt"
-	_ "net/url"
+	"net/url"
 	// "log"      //日志库
 
 	"encoding/json"
@@ -50,20 +50,27 @@ func GetParams(r *http.Request) map[string]interface{} {
 
 // map转http参数
 func CreateParams(params map[string]interface{}) string {
-	b := bytes.Buffer{}
-	var index int = 0
-	for k, v := range params {
-		if index > 0 {
-			b.WriteString("&")
-		}
-		index++
-		//写入参数
-		b.WriteString(k)
-		b.WriteString("=")
-		b.WriteString(fmt.Sprint(v))
+	// b := bytes.Buffer{}
+	// var index int = 0
+	// for k, v := range params {
+	// 	if index > 0 {
+	// 		b.WriteString("&")
+	// 	}
+	// 	index++
+	// 	//写入参数
+	// 	b.WriteString(k)
+	// 	b.WriteString("=")
+	// 	b.WriteString(fmt.Sprint(v))
 
+	// }
+	// return b.String()
+
+	// url加密
+	values := url.Values{}
+	for k, v := range params {
+		values.Add(k, fmt.Sprint(v))
 	}
-	return b.String()
+	return values.Encode()
 }
 
 func Response(data []byte, w http.ResponseWriter) {

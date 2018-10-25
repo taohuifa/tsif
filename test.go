@@ -6,6 +6,7 @@ import (
 
 	"github.com/tsif/app"
 	"github.com/tsif/utils"
+	"github.com/tsif/utils/http"
 
 	Log "github.com/tsif/component/log"
 )
@@ -56,7 +57,18 @@ func test02() {
 	}
 }
 
+func test03() {
+	params := make(map[string]interface{})
+	params["1"] = 1
+	params["2"] = 2
+	params["a"] = "松松散散"
+	mstr := http.CreateParams(params)
+
+	Log.Infof("params ", params, mstr)
+}
+
 func main() {
 	// test01()
-	test02()
+	// test02()
+	test03()
 }
