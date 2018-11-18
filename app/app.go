@@ -116,7 +116,7 @@ func run(this *Context, pid string, params ...interface{}) error {
 	this.state = APPSTATE_STARTING
 	// Log.Info("app init: " + fmt.Sprint(params))
 	if this.InitFunc != nil {
-		result = this.InitFunc(this, params)
+		result = this.InitFunc(this, params...)
 		if !result {
 			return errors.New("init error")
 		}
@@ -141,10 +141,13 @@ func run(this *Context, pid string, params ...interface{}) error {
 			}
 		}
 
-		// get cmd
-		cmds := getCmd(pid)
-		if cmds != nil {
-			disposeCmd(this, cmds)
+		// check pid mode
+		if pid != "" {
+			// get cmd
+			cmds := getCmd(pid)
+			if cmds != nil {
+				disposeCmd(this, cmds)
+			}
 		}
 
 		// counter
@@ -170,10 +173,16 @@ func run(this *Context, pid string, params ...interface{}) error {
 }
 
 // 运行app
+// @param pidFile	pid文件存在路径, 如果为空则不传递指令
+// @param cmd		执行指令, 如果pid文件存在则发送到具体pid中
+// @param params	其他参数, 传递到initFunc
 func (this *Context) Run(pidFile string, cmd string, params ...interface{}) error {
 	// check params
 	if pidFile == "" || cmd == "" {
-		return errors.New(fmt.Sprintf("param fail! pidFile=\"%s\", cmd=\"%s\".\n", pidFile, cmd))
+		// return errors.New(fmt.Sprintf("param fail! pidFile=\"%s\", cmd=\"%s\".\n", pidFile, cmd))
+		// 无pid和cmd, 运行程序
+		err := run(this, "", params...)
+		return err
 	}
 	// 判断pid文件是否存在
 	_, err_s := os.Stat(pidFile)
@@ -200,7 +209,7 @@ func (this *Context) Run(pidFile string, cmd string, params ...interface{}) erro
 	ioutil.WriteFile(pidFile, []byte(pid), 0644)
 
 	// 运行程序
-	err := run(this, pid, params)
+	err := run(this, pid, params...)
 
 	// 清除文件
 	cmdFile := pid + APPCMD_FILE_SUFFIX
