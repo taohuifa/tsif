@@ -4,52 +4,52 @@ package log
 // var Log LogContext = *From(LOG_DEBUG, "./", "log")
 var Log LogContext = *From(LOG_INFO, "", "log")
 
-func Debug(msg string) {
-	Log.Debug(msg)
+func Debug(params ...interface{}) {
+	Log.Debug(params...)
 }
-func Info(msg string) {
-	Log.Info(msg)
+func Info(params ...interface{}) {
+	Log.Info(params...)
 }
-func Warn(msg string) {
-	Log.Warn(msg)
+func Warn(params ...interface{}) {
+	Log.Warn(params...)
 }
-func Error(msg string) {
-	Log.Error(msg)
-}
-
-func Write(loglv int, frame int, msg string) {
-	Log.Write(loglv, frame, "", msg)
+func Error(params ...interface{}) {
+	Log.Error(params...)
 }
 
-func Debugf(params ...interface{}) {
-	Log.Debugf(params...)
-}
-func Infof(params ...interface{}) {
-	Log.Infof(params...)
-}
-func Warnf(params ...interface{}) {
-	Log.Warnf(params...)
-}
-func Errorf(params ...interface{}) {
-	Log.Errorf(params...)
+func Write(loglv int, frame int, params ...interface{}) {
+	Log.Write(loglv, frame, "", params...)
 }
 
-func Writef(loglv int, frame int, params ...interface{}) {
-	Log.Write(loglv, frame+1, "", ToString(params...))
+func Debugf(format string, params ...interface{}) {
+	Log.Debugf(format, params...)
+}
+func Infof(format string, params ...interface{}) {
+	Log.Infof(format, params...)
+}
+func Warnf(format string, params ...interface{}) {
+	Log.Warnf(format, params...)
+}
+func Errorf(format string, params ...interface{}) {
+	Log.Errorf(format, params...)
 }
 
-func DebugStack(msg string) {
-	Log.DebugStack(msg)
+func Writef(loglv int, frame int, format string, params ...interface{}) {
+	Log.Writef(loglv, frame+1, "", format, params...)
 }
-func InfoStack(msg string) {
-	Log.InfoStack(msg)
+
+func Debugs(params ...interface{}) {
+	Log.Debugs(params...)
 }
-func WarnStack(msg string) {
-	Log.WarnStack(msg)
+func Infos(params ...interface{}) {
+	Log.Infos(params...)
 }
-func ErrorStack(msg string) {
-	Log.ErrorStack(msg)
+func Warns(params ...interface{}) {
+	Log.Warns(params...)
 }
-func WriteStack(loglv int, frame int, msg string) {
-	Log.WriteStack(loglv, frame, msg)
+func Errors(params ...interface{}) {
+	Log.Errors(params...)
+}
+func Writes(loglv int, frame int, params ...interface{}) {
+	Log.Writes(loglv, frame, params...)
 }

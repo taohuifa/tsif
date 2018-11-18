@@ -42,16 +42,16 @@ func test01() {
 
 func test02() {
 	// init app
-	initFunc := func(context *app.AppContext, params ...interface{}) bool {
+	initFunc := func(context *app.Context, params ...interface{}) bool {
 		context.Stop(5 * 1000)
 		return true
 	}
-	destroyFunc := func(context *app.AppContext) {
+	destroyFunc := func(context *app.Context) {
 
 	}
-	appCtx := app.AppContext{Name: "app", InitFunc: initFunc, DestroyFunc: destroyFunc}
+	appCtx := app.Context{Name: "app", InitFunc: initFunc, DestroyFunc: destroyFunc}
 	// start
-	err := appCtx.Start(1, 2, "3")
+	err := appCtx.Run("", "", 1, 2, 3)
 	if err != nil {
 		Log.Info("app start fail! " + err.Error())
 	}
@@ -64,7 +64,12 @@ func test03() {
 	params["a"] = "松松散散"
 	mstr := http.CreateParams(params)
 
-	Log.Infof("params ", params, mstr)
+	Log.Error(1, 2, 3, 4, 5)
+	Log.Info("params ", params, mstr)
+	Log.Warnf("hehehe %d %d s:%d %d", 1, 2, 3, 4)
+	Log.Info("1")
+
+	Log.Errors("123", "444")
 }
 
 func main() {
