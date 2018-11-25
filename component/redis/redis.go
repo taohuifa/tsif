@@ -67,9 +67,14 @@ func (this *RedisClient) get(key string) (interface{}, error) {
 	return this.do("GET", this.Prefix+key)
 }
 
-// 提取数据
+// 提取字符串数据
 func (this *RedisClient) Get(key string) (string, error) {
 	return redis.String(this.get(key))
+}
+
+// 提取整型数据
+func (this *RedisClient) GetInt(key string) (int, error) {
+	return redis.Int(this.get(key))
 }
 
 // 设置数据
