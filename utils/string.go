@@ -45,3 +45,13 @@ func SplitMap(str string, sepA string, sepB string) *map[string]string {
 	}
 	return &mmap
 }
+
+// 首字母大写
+func FirstUpper(str string) string {
+	return strings.ToUpper(string(str[0])) + str[1:]
+}
+
+// 首字母小写
+func FirstLower(str string) string {
+	return strings.ToLower(string(str[0])) + str[1:]
+}

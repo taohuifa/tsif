@@ -72,8 +72,14 @@ func test03() {
 	Log.Errors("123", "444")
 }
 
+func test04() {
+	Log.Info("test", utils.FirstUpper("abc"))
+	Log.Info("test", utils.FirstLower("AAAAVB"))
+}
+
 func main() {
 	// test01()
 	// test02()
-	test03()
+	// test03()
+	test04()
 }
