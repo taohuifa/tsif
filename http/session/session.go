@@ -94,7 +94,7 @@ func (this *SessionManager) Get(sessionId string) (*Session, error) {
 	// 读取session
 	session, ok := this.sessions[sessionId]
 	if !ok {
-		return nil, errors.New("no exist")
+		return nil, errors.New("session no exist")
 	}
 	session.updateTime = time.Now().UnixNano()
 	return session, nil
