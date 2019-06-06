@@ -4,6 +4,7 @@ import (
 	// "bytes"
 	"fmt"
 	"net/url"
+
 	// "log"      //日志库
 
 	"encoding/json"
@@ -21,6 +22,22 @@ func GetParamByGet(r *http.Request, key string, defaultvalue interface{}) interf
 		return defaultvalue
 	}
 	return values[0]
+
+	// 解析参数
+	// r.ParseForm() // 解析参数，默认是不会解析的
+
+	// // 获取解析参数
+	// values := r.Form
+	// var vlen = len(values)
+	// if vlen <= 0 {
+	// 	return defaultvalue // 没有值, 返回默认参数
+	// }
+	// // 获取值
+	// v, ok := values[key]
+	// if !ok {
+	// 	return defaultvalue // 没有值, 返回默认参数
+	// }
+	// return v
 }
 
 // 获取Http参数
@@ -30,8 +47,8 @@ func GetParam(r *http.Request, key string, defaultvalue interface{}) interface{}
 
 // 解析参数
 func GetParams(r *http.Request) map[string]interface{} {
-	//解析参数
-	r.ParseForm() //解析参数，默认是不会解析的
+	// 解析参数
+	r.ParseForm() // 解析参数，默认是不会解析的
 	// 常规解析方法
 	var params = make(map[string]interface{})
 	values := r.Form

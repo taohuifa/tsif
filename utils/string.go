@@ -55,3 +55,13 @@ func FirstUpper(str string) string {
 func FirstLower(str string) string {
 	return strings.ToLower(string(str[0])) + str[1:]
 }
+
+// 字符串重复
+func Repeat(str string, num int, sep string) string {
+	var buf bytes.Buffer
+	for i := 0; i < num; i++ {
+		buf.WriteString(str)
+		buf.WriteString(sep)
+	}
+	return buf.String()
+}

@@ -14,6 +14,14 @@ import (
 	"bytes"
 )
 
+// 日志对象
+type logItem struct {
+	logger      *log.Logger // 日志器
+	logFile     *os.File    // 日志文件
+	logFileName string      // 当前日志文件名
+	checkTime   int64       // 上次检测时间
+}
+
 // 日志环境
 type LogContext struct {
 	logLevel int // 日志等级
@@ -22,7 +30,7 @@ type LogContext struct {
 	logPath   string // 日志路径
 	logName   string // 日志名
 
-	loggers map[int]*log.Logger // 日志器
+	loggers map[int]*logItem // 日志器
 }
 
 const (
@@ -89,34 +97,35 @@ func getStack(frame int, depth int) string {
 }
 
 // 初始化日志
-func createLogger(loglv int, logPath string, logName string) *log.Logger {
+func (this *logItem) init(loglv int, logFileName string) error {
 	//check log path
-	if logPath == "" {
-		panic(errors.New("empty log path " + logPath))
-
+	if logFileName == "" {
+		panic(errors.New("empty log path " + logFileName))
 	}
-	// log file
-	logLvName := getLogLvName(loglv)
-	logfile := fmt.Sprintf("%s/%s_%s_%s.txt", logPath, logName, strings.ToLower(logLvName), time.Now().Local().Format("2006010215"))
-
-	// check path
-	_, errPath := os.Stat(logPath)
-	if errPath != nil {
-		// 错误, 文件夹不存在
-		errMkdir := os.Mkdir(logPath, os.ModePerm)
-		if errMkdir != nil {
-			panic(errMkdir)
-		}
-	}
+	this.logFileName = logFileName
 
 	// create log file
-	logFile, err := os.Create(logfile)
+	logFile, err := os.Create(this.logFileName)
 	if err != nil {
-		panic(errors.New("error log file! loglv=" + fmt.Sprint(loglv) + " file=" + logfile + "."))
+		return errors.New("error log file! loglv=" + fmt.Sprint(loglv) + " file=" + this.logFileName + ".")
 	}
 	// l := log.New(logFile, "", log.Llongfile|log.Ldate|log.Ltime|log.Lmicroseconds)
-	l := log.New(logFile, "", log.Ldate|log.Ltime|log.Lmicroseconds)
-	return l
+	this.logger = log.New(logFile, "", log.Ldate|log.Ltime|log.Lmicroseconds)
+	this.logFile = logFile
+	this.checkTime = time.Now().Unix()
+	return nil
+}
+
+// 销毁
+func (this *logItem) destory() error {
+	// this.logger.close()
+	// this.logger.GetFile()
+	this.logger = nil
+	this.logFileName = ""
+	this.checkTime = 0
+	this.logFile.Close()
+	this.logFile = nil
+	return nil
 }
 
 // to string
@@ -147,7 +156,7 @@ func From(loglv int, logPath string, logName string) *LogContext {
 
 	// create
 	logObj := LogContext{logLevel: loglv, logPath: logPath, logName: logName}
-	logObj.loggers = make(map[int]*log.Logger)
+	logObj.loggers = make(map[int]*logItem)
 	// check use logger
 	if logPath != "" && logName != "" {
 		logObj.useLogger = true
@@ -157,20 +166,70 @@ func From(loglv int, logPath string, logName string) *LogContext {
 	return &logObj
 }
 
+// get log file name
+func getLogFileName(loglv int, logPath string, logName string) string {
+	logLvName := getLogLvName(loglv)
+	logFileName := fmt.Sprintf("%s/%s_%s_%s.txt", logPath, logName, strings.ToLower(logLvName), time.Now().Local().Format("20060102")) // 天
+	// logFileName := fmt.Sprintf("%s/%s_%s_%s.txt", logPath, logName, strings.ToLower(logLvName), time.Now().Local().Format("2006010215")) // 小时
+	// logFileName := fmt.Sprintf("%s/%s_%s_%s.txt", logPath, logName, strings.ToLower(logLvName), time.Now().Local().Format("200601021504")) // 分钟
+	return logFileName
+}
+
 func (this *LogContext) GetLogger(loglv int) *log.Logger {
 	// check
 	if !checkLogLv(loglv) {
 		panic(errors.New("error log level " + fmt.Sprint(loglv)))
 	}
+
 	// get logger
 	l, ok := this.loggers[loglv]
 	if ok {
-		return l
+		// 检测时间, 60s检测一次
+		nowTime := time.Now().Unix()
+		if nowTime-l.checkTime < 10 {
+			return l.logger // 未到检测时间
+		}
+		l.checkTime = nowTime
+
+		// 检测日志是否对应(检测日志更新)
+		logFileName := getLogFileName(loglv, this.logPath, this.logName)
+		if l.logFileName == logFileName {
+			return l.logger // 文件一致, 可直接用
+		}
+		// 日志文件失效, 重新创建1个
+		l.destory()
+		this.loggers[loglv] = nil
+		l = nil
 	}
-	// create init
-	l = createLogger(loglv, this.logPath, this.logName)
+
+	// check path
+	_, errPath := os.Stat(this.logPath)
+	if errPath != nil {
+		// 错误, 文件夹不存在
+		errMkdir := os.Mkdir(this.logPath, os.ModePerm)
+		if errMkdir != nil {
+			panic(errMkdir)
+			// return nil
+		}
+	}
+
+	// create log
+	l = &logItem{}
+	if l == nil {
+		panic(errors.New("create log fail, level " + fmt.Sprint(loglv)))
+		// return nil
+	}
+	logFileName := getLogFileName(loglv, this.logPath, this.logName)
+
+	// init log item
+	lerr := l.init(loglv, logFileName)
+	if lerr != nil {
+		panic(lerr)
+		// return nil
+	}
+	// 获取日志器
 	this.loggers[loglv] = l
-	return l
+	return l.logger
 }
 
 // 输出函数
@@ -187,7 +246,8 @@ func (this *LogContext) write(loglv int, frame int, ext string, msg string) {
 	buffer.WriteString(" ")
 	buffer.WriteString(getStack(frame, 1))
 	buffer.WriteString(":")
-	buffer.WriteString("\r\n")
+	// buffer.WriteString("\r\n")	// 换行, 搜索起来不带时间不好
+	buffer.WriteString(" ")
 	buffer.WriteString(msg)
 	if ext != "" {
 		buffer.WriteString("\r\n\t")
