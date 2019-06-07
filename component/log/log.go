@@ -109,8 +109,8 @@ func (this *logItem) init(loglv int, logFileName string) error {
 	if err != nil {
 		return errors.New("error log file! loglv=" + fmt.Sprint(loglv) + " file=" + this.logFileName + ".")
 	}
-	// l := log.New(logFile, "", log.Llongfile|log.Ldate|log.Ltime|log.Lmicroseconds)
-	this.logger = log.New(logFile, "", log.Ldate|log.Ltime|log.Lmicroseconds)
+	// this.logger = log.New(logFile, "", log.Ldate|log.Ltime|log.Lmicroseconds)
+	this.logger = log.New(logFile, "", 0)
 	this.logFile = logFile
 	this.checkTime = time.Now().Unix()
 	return nil
