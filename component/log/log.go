@@ -105,7 +105,8 @@ func (this *logItem) init(loglv int, logFileName string) error {
 	this.logFileName = logFileName
 
 	// create log file
-	logFile, err := os.Create(this.logFileName)
+	// logFile, err := os.Create(this.logFileName)
+	logFile, err := os.OpenFile(this.logFileName, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0666) // 打开追加文件
 	if err != nil {
 		return errors.New("error log file! loglv=" + fmt.Sprint(loglv) + " file=" + this.logFileName + ".")
 	}
