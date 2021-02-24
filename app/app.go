@@ -153,12 +153,12 @@ func run(this *Context, pid string, params ...interface{}) error {
 		// counter
 		count++
 		dt := int((nowtime.UnixNano() - prevtime.UnixNano()) / 1e6)
-		prevtime = nowtime
 		// Log.Infof("app update", dt, count)
 		// update
 		if this.UpdateFunc != nil {
 			this.UpdateFunc(this, count, dt, nowtime, prevtime)
 		}
+		prevtime = nowtime
 	}
 
 	// destory
